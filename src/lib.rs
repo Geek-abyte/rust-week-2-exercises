@@ -68,6 +68,7 @@ pub fn move_txid(txid: String) -> String {
     format!("txid: {}", txid)
 }
 
+#[derive(Debug, PartialEq)]
 pub enum Opcode {
     OpChecksig,
     OpDup,
@@ -84,6 +85,7 @@ impl Opcode {
     }
 }
 
+#[derive(Debug, PartialEq, Clone)]
 pub struct UTXO {
     pub txid: Vec<u8>,
     pub vout: u32,
