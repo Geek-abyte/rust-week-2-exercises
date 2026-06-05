@@ -28,6 +28,7 @@ pub fn parse_satoshis(input: &str) -> Result<u64, String> {
     input.parse::<u64>().map_err(|_| "invalid satoshi amount".to_string())
 }
 
+#[derive(Debug, PartialEq)]
 pub enum ScriptType {
     P2PKH,
     P2WPKH,
@@ -36,17 +37,19 @@ pub enum ScriptType {
 
 pub fn classify_script(script: &[u8]) -> ScriptType {
     // TODO: Match script pattern and return corresponding ScriptType
-    [0x76, 0xa9, 0x14, ..] => ScriptType::P2PKH,
-    [0x00, 0x14, ..] => ScriptType::P2WPKH,
-    _ => ScriptType::Unknown,
+    match script {
+        [0x76, 0xa9, 0x14, ..] => ScriptType::P2PKH,
+        [0x00, 0x14, ..] => ScriptType::P2WPKH,
+        _ => ScriptType::Unknown,
+    }
 }
 
 // TODO: complete Outpoint tuple struct
-pub struct Outpoint();
+pub struct Outpoint(pub String, pub u32);
 
 pub fn read_pushdata(script: &[u8]) -> &[u8] {
     // TODO: Return the pushdata portion of the script slice (assumes pushdata starts at index 2)
-    todo!()
+    &script[2..]
 }
 
 pub trait Wallet {
@@ -60,21 +63,22 @@ pub struct TestWallet {
 impl Wallet for TestWallet {
     fn balance(&self) -> u64 {
         // TODO: Return the wallet's confirmed balance
-        todo!()
+        self.confirmed
     }
 }
 
 pub fn apply_fee(balance: &mut u64, fee: u64) {
     // TODO: Subtract fee from mutable balance reference
-    todo!()
+    *balance -= fee;
 }
 
 pub fn move_txid(txid: String) -> String {
     // TODO: Return formatted string including the txid for display or logging
-    todo!()
+    format!("txid: {}", txid)
 }
 
 // TODO: Add necessary derive traits
+#[derive(Debug, PartialEq)] 
 pub enum Opcode {
     OpChecksig,
     OpDup,
@@ -84,11 +88,16 @@ pub enum Opcode {
 impl Opcode {
     pub fn from_byte(byte: u8) -> Result<Self, String> {
         // TODO: Implement mapping from byte to Opcode variant
-        todo!()
+        match byte {
+            0xac => Ok(Opcode::OpChecksig),
+            0x76 => Ok(Opcode::OpDup),
+            _ => Err(format!("invalid opcode: {:#04x}", byte)),
+        }
     }
 }
 
 // TODO: Add necessary derive traits
+#[derive(Debug, PartialEq, Clone)] 
 pub struct UTXO {
     pub txid: Vec<u8>,
     pub vout: u32,
@@ -97,5 +106,5 @@ pub struct UTXO {
 
 pub fn consume_utxo(utxo: UTXO) -> UTXO {
     // TODO: Implement UTXO consumption logic (if any)
-    todo!()
+    utxo
 }
